@@ -1,0 +1,18 @@
+Parameter,Value
+Description,"Lead-Acid Battery Water Level Management System — 24-Hour Time-Series Dataset"
+Generated At,2026-05-08T06:49:34.116Z
+Interval (minutes),5
+Total Data Points,288
+Duration (hours),24
+Start Time,2026-05-07T02:30:00.000Z
+Tank Height (cm),20
+Low Threshold (%),30
+Full Threshold (%),95
+
+Chamber,Name,Drain Rate (%/interval),Initial Level (%)
+tank1,Chamber A-1,0.85,82
+tank2,Chamber A-2,1.15,70
+tank3,Chamber B-1,0.7,90
+tank4,Chamber B-2,0.9,60
+tank5,Chamber C-1,1.2,45
+tank6,Chamber C-2,0.75,75

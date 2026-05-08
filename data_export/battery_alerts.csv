@@ -1,0 +1,39 @@
+Alert ID,Timestamp,Date,Time,Type,Severity,Message,Chamber
+1,2026-05-07T03:40:00.000Z,7/5/2026,09:10:00,WARNING,WARNING,"Chamber C-1 water level low (29.1%) — starting refill",tank5
+2,2026-05-07T04:25:00.000Z,7/5/2026,09:55:00,WARNING,WARNING,"Chamber B-2 water level low (29.4%) — starting refill",tank4
+3,2026-05-07T04:30:00.000Z,7/5/2026,10:00:00,WARNING,WARNING,"Chamber A-2 water level low (26.9%) — starting refill",tank2
+4,2026-05-07T05:30:00.000Z,7/5/2026,11:00:00,WARNING,WARNING,"Chamber C-2 water level low (29.9%) — starting refill",tank6
+5,2026-05-07T05:40:00.000Z,7/5/2026,11:10:00,WARNING,WARNING,"Chamber A-1 water level low (29.2%) — starting refill",tank1
+6,2026-05-07T05:55:00.000Z,7/5/2026,11:25:00,SUCCESS,OK,"Chamber C-1 refill completed — level at 96.6%",tank5
+7,2026-05-07T06:40:00.000Z,7/5/2026,12:10:00,SUCCESS,OK,"Chamber B-2 refill completed — level at 96.3%",tank4
+8,2026-05-07T06:50:00.000Z,7/5/2026,12:20:00,SUCCESS,OK,"Chamber A-2 refill completed — level at 96.8%",tank2
+9,2026-05-07T07:25:00.000Z,7/5/2026,12:55:00,WARNING,WARNING,"Chamber B-1 water level low (28.3%) — starting refill",tank3
+10,2026-05-07T07:45:00.000Z,7/5/2026,13:15:00,SUCCESS,OK,"Chamber C-2 refill completed — level at 96.7%",tank6
+11,2026-05-07T07:55:00.000Z,7/5/2026,13:25:00,SUCCESS,OK,"Chamber A-1 refill completed — level at 97.0%",tank1
+12,2026-05-07T08:30:00.000Z,7/5/2026,14:00:00,WARNING,WARNING,"Chamber C-1 water level low (27.0%) — starting refill",tank5
+13,2026-05-07T08:30:00.000Z,7/5/2026,14:00:00,ERROR,CRITICAL,"ESP32 Module #2 — sensor read timeout (recovered)",SYSTEM
+14,2026-05-07T09:40:00.000Z,7/5/2026,15:10:00,SUCCESS,OK,"Chamber B-1 refill completed — level at 95.3%",tank3
+15,2026-05-07T09:45:00.000Z,7/5/2026,15:15:00,WARNING,WARNING,"Chamber A-2 water level low (28.6%) — starting refill",tank2
+16,2026-05-07T10:05:00.000Z,7/5/2026,15:35:00,WARNING,WARNING,"Chamber B-2 water level low (29.9%) — starting refill",tank4
+17,2026-05-07T10:50:00.000Z,7/5/2026,16:20:00,SUCCESS,OK,"Chamber C-1 refill completed — level at 97.2%",tank5
+18,2026-05-07T11:25:00.000Z,7/5/2026,16:55:00,WARNING,WARNING,"Chamber A-1 water level low (29.2%) — starting refill",tank1
+19,2026-05-07T12:00:00.000Z,7/5/2026,17:30:00,SUCCESS,OK,"Chamber A-2 refill completed — level at 96.2%",tank2
+20,2026-05-07T12:20:00.000Z,7/5/2026,17:50:00,SUCCESS,OK,"Chamber B-2 refill completed — level at 97.1%",tank4
+21,2026-05-07T12:20:00.000Z,7/5/2026,17:50:00,WARNING,WARNING,"Chamber C-2 water level low (28.2%) — starting refill",tank6
+22,2026-05-07T13:10:00.000Z,7/5/2026,18:40:00,WARNING,WARNING,"Chamber C-1 water level low (27.3%) — starting refill",tank5
+23,2026-05-07T13:40:00.000Z,7/5/2026,19:10:00,SUCCESS,OK,"Chamber A-1 refill completed — level at 97.2%",tank1
+24,2026-05-07T14:15:00.000Z,7/5/2026,19:45:00,WARNING,WARNING,"Chamber B-1 water level low (29.5%) — starting refill",tank3
+25,2026-05-07T14:30:00.000Z,7/5/2026,20:00:00,ERROR,CRITICAL,"ESP32 Module #3 connectivity intermittent — 2 missed heartbeats",SYSTEM
+26,2026-05-07T14:35:00.000Z,7/5/2026,20:05:00,SUCCESS,OK,"Chamber C-2 refill completed — level at 95.5%",tank6
+27,2026-05-07T15:30:00.000Z,7/5/2026,21:00:00,SUCCESS,OK,"Chamber C-1 refill completed — level at 96.6%",tank5
+28,2026-05-07T16:30:00.000Z,7/5/2026,22:00:00,SUCCESS,OK,"Chamber B-1 refill completed — level at 97.4%",tank3
+29,2026-05-07T16:40:00.000Z,7/5/2026,22:10:00,WARNING,WARNING,"Chamber A-2 water level low (29.1%) — starting refill",tank2
+30,2026-05-07T18:55:00.000Z,8/5/2026,00:25:00,SUCCESS,OK,"Chamber A-2 refill completed — level at 97.3%",tank2
+31,2026-05-07T19:05:00.000Z,8/5/2026,00:35:00,WARNING,WARNING,"Chamber B-2 water level low (28.9%) — starting refill",tank4
+32,2026-05-07T21:20:00.000Z,8/5/2026,02:50:00,SUCCESS,OK,"Chamber B-2 refill completed — level at 96.5%",tank4
+33,2026-05-07T21:35:00.000Z,8/5/2026,03:05:00,WARNING,WARNING,"Chamber A-1 water level low (29.4%) — starting refill",tank1
+34,2026-05-07T21:55:00.000Z,8/5/2026,03:25:00,WARNING,WARNING,"Chamber C-1 water level low (29.4%) — starting refill",tank5
+35,2026-05-07T23:50:00.000Z,8/5/2026,05:20:00,SUCCESS,OK,"Chamber A-1 refill completed — level at 96.6%",tank1
+36,2026-05-08T00:10:00.000Z,8/5/2026,05:40:00,SUCCESS,OK,"Chamber C-1 refill completed — level at 96.8%",tank5
+37,2026-05-08T00:50:00.000Z,8/5/2026,06:20:00,WARNING,WARNING,"Chamber C-2 water level low (29.8%) — starting refill",tank6
+38,2026-05-08T01:15:00.000Z,8/5/2026,06:45:00,WARNING,WARNING,"Chamber A-2 water level low (29.7%) — starting refill",tank2

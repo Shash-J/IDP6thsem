@@ -1,0 +1,28 @@
+{
+  "name": "batteryguard-iot-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Professional IoT Dashboard for Lead-Acid Battery Water Level Management System",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.7",
+    "tailwindcss": "^4.1.7",
+    "vite": "^8.0.10"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "date-fns": "^4.1.0",
+    "firebase": "^12.13.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.6.0",
+    "react-router-dom": "^7.15.0",
+    "recharts": "^3.8.1"
+  }
+}
