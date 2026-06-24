@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "description": "Linear regression weights for battery health, RUL, and sulfation forecasting.",
+    "trainedAt": "2026-06-24",
+    "features": [
+      "voltage",
+      "current",
+      "temperature",
+      "internalResistance",
+      "specificGravity"
+    ]
+  },
+  "soh": {
+    "intercept": 149.2500000251439,
+    "coefficients": {
+      "voltage": 2.587654535091133e-09,
+      "current": 1.3994849723530933e-10,
+      "temperature": -0.09999999997601883,
+      "internalResistance": -16.499999999882164,
+      "specificGravity": 21.999999953879524
+    }
+  },
+  "rul": {
+    "intercept": 615.0950563004171,
+    "coefficients": {
+      "voltage": 1.7452448329501635,
+      "current": 1.561015401640077,
+      "temperature": -6.011188802985487,
+      "internalResistance": -43.70791357269752,
+      "specificGravity": 34.40535696934967
+    }
+  },
+  "sulfation": {
+    "intercept": 1260.3104062492055,
+    "coefficients": {
+      "voltage": -13.627883579971936,
+      "current": 4.525828468066074,
+      "temperature": -0.4959475660668482,
+      "internalResistance": 1.5792854603034812,
+      "specificGravity": -886.2233252228787
+    }
+  }
+}

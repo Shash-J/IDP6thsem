@@ -8,7 +8,7 @@ import { MdOutlineToggleOn } from 'react-icons/md';
 const ValveControl = ({ chambers, onToggleValve }) => {
   if (!chambers) return null;
 
-  const chamberEntries = Object.entries(chambers);
+  const chamberEntries = Object.entries(chambers).filter(([, d]) => d.active !== false);
 
   return (
     <div className="glass-card p-5" id="valve-control-card">

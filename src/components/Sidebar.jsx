@@ -1,20 +1,25 @@
-import { MdOutlineWaterDrop, MdDashboard, MdBarChart, MdNotificationsActive, MdSettings, MdTune } from 'react-icons/md';
+import { MdDashboard, MdBarChart, MdOutlineWaterDrop } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import { MdBatteryChargingFull } from 'react-icons/md';
+import { useChambers } from '../hooks/useFirebase';
 
 /**
  * Sidebar Component
  * Slide-out overlay navigation on all screen sizes.
  * Opens via hamburger menu, closes via X button or clicking the backdrop.
  */
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, activeTab, onTabChange }) => {
+  const { chambers } = useChambers();
+  
   const navItems = [
-    { icon: MdDashboard, label: 'Dashboard', active: true },
-    { icon: MdBarChart, label: 'Analytics', active: false },
-    { icon: MdNotificationsActive, label: 'Alerts', active: false },
-    { icon: MdTune, label: 'Controls', active: false },
-    { icon: MdSettings, label: 'Settings', active: false },
+    { id: 'dashboard', icon: MdDashboard, label: 'Dashboard' },
+    { id: 'predictions', icon: MdBarChart, label: 'ML Predictions' },
   ];
+
+  // Count active/online chambers
+  const activeChambers = chambers
+    ? Object.values(chambers).filter(c => c.active).length
+    : 0;
 
   return (
     <>
@@ -66,11 +71,12 @@ const Sidebar = ({ isOpen, onClose }) => {
           </p>
           {navItems.map((item) => (
             <a
-              key={item.label}
+              key={item.id}
               href="#"
-              className={`sidebar-link ${item.active ? 'active' : ''}`}
+              className={`sidebar-link ${activeTab === item.id ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
+                onTabChange(item.id);
                 onClose();
               }}
             >
@@ -89,16 +95,16 @@ const Sidebar = ({ isOpen, onClose }) => {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-500">ESP32 Modules</span>
-                <span className="text-emerald-400 font-medium">3 Online</span>
+                <span className="text-slate-500">Chambers Active</span>
+                <span className="text-cyan-400 font-medium">{activeChambers} / 2</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-slate-500">Uptime</span>
-                <span className="text-slate-300 font-mono">48h 23m</span>
+                <span className="text-slate-500">ML Model Status</span>
+                <span className="text-emerald-400 font-medium">Ready</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-slate-500">Data Points</span>
-                <span className="text-slate-300 font-mono">12,847</span>
+                <span className="text-slate-500">Architecture</span>
+                <span className="text-slate-400 font-mono text-[10px]">Cloudless LAN</span>
               </div>
             </div>
           </div>

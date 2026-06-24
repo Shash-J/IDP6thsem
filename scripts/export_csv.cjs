@@ -25,23 +25,17 @@ chamberIds.forEach((id) => {
 });
 
 // Build CSV header
-const headers = ['Timestamp', 'Date', 'Time'];
+const headers = ['Date', 'Time'];
 chamberIds.forEach((id) => {
   const name = chamberNames[id];
   headers.push(
     `${name} Water%`,
-    `${name} Level(cm)`,
-    `${name} Status`,
-    `${name} Valve`,
     `${name} Voltage(V)`,
     `${name} Current(A)`,
     `${name} Temp(C)`,
-    `${name} Sp.Gravity`,
-    `${name} Resistance(mOhm)`,
     `${name} SoC(%)`
   );
 });
-headers.push('Pump Status', 'System Mode');
 
 // Build rows
 const rows = dataset.timeseries.map((dp) => {
@@ -49,23 +43,17 @@ const rows = dataset.timeseries.map((dp) => {
   const date = ts.toLocaleDateString('en-IN');
   const time = ts.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-  const cols = [dp.timestamp, date, time];
+  const cols = [date, time];
   chamberIds.forEach((id) => {
     const c = dp.chambers[id];
     cols.push(
       c.waterPercent,
-      c.waterLevel,
-      c.status,
-      c.valve ? 'OPEN' : 'CLOSED',
       c.batteryParams?.voltage || '',
       c.batteryParams?.current || '',
       c.batteryParams?.temperature || '',
-      c.batteryParams?.specificGravity || '',
-      c.batteryParams?.internalResistance || '',
       c.batteryParams?.stateOfCharge || ''
     );
   });
-  cols.push(dp.pump.status ? 'ON' : 'OFF', dp.system.mode);
   return cols;
 });
 

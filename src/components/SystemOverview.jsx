@@ -18,7 +18,7 @@ const SystemOverview = ({ chambers, pump, system }) => {
     const avgLevel = entries.length > 0
       ? entries.filter((c) => c.waterPercent != null).reduce((sum, c) => sum + (c.waterPercent || 0), 0) / Math.max(1, entries.filter((c) => c.waterPercent != null).length)
       : 0;
-    const lowCount = entries.filter((c) => c.status === 'Low').length;
+    const lowCount = entries.filter((c) => c.status === 'Low' || (c.waterPercent != null && c.waterPercent < 30)).length;
     const fillingCount = entries.filter((c) => c.status === 'Filling').length;
     const normalCount = entries.filter((c) => c.status === 'Normal' || c.status === 'Full').length;
 

@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
+import Predictions from './pages/Predictions';
 
 /**
  * Root Application Component
@@ -11,6 +12,7 @@ import Dashboard from './pages/Dashboard';
  */
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
     <div className="flex min-h-screen">
@@ -30,13 +32,18 @@ function App() {
       />
 
       {/* Sidebar — overlay on all screen sizes */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       {/* Main Content — always full width */}
       <div className="flex-1 flex flex-col min-h-screen w-full">
         <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
         <main className="flex-1 p-4 md:p-6 lg:p-8">
-          <Dashboard />
+          {activeTab === 'dashboard' ? <Dashboard /> : <Predictions />}
         </main>
       </div>
     </div>

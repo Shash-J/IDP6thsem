@@ -27,27 +27,14 @@ Object.keys(timeseries[0].chambers).forEach((id) => {
   onlineState[id] = ACTIVE_CHAMBERS.includes(id); // Active ones start online
 });
 
-/** Build chamber data for a given timeseries data point */
 function buildChamberData(dp) {
   const result = {};
-  Object.entries(dp.chambers).forEach(([id, data]) => {
-    const isActive = ACTIVE_CHAMBERS.includes(id);
+  ACTIVE_CHAMBERS.forEach((id) => {
+    const data = dp.chambers[id];
     const isOnline = onlineState[id];
+    if (!data) return;
 
-    if (!isActive) {
-      // Inactive chamber — show minimal info
-      result[id] = {
-        name: data.name,
-        active: false,
-        online: false,
-        waterPercent: null,
-        waterLevel: null,
-        status: 'Inactive',
-        valve: false,
-        batteryParams: null,
-        lastUpdated: null,
-      };
-    } else if (!isOnline) {
+    if (!isOnline) {
       // Active but offline — show mock/stale data
       result[id] = {
         name: data.name,
@@ -81,6 +68,7 @@ ACTIVE_CHAMBERS.forEach((id) => {
     waterPercent: dp.chambers[id].waterPercent,
     waterLevel: dp.chambers[id].waterLevel,
     timestamp: dp.timestamp,
+    batteryParams: dp.chambers[id].batteryParams,
   }));
 });
 currentIndex = seedCount;
@@ -140,6 +128,7 @@ setInterval(() => {
       waterPercent: dp.chambers[id].waterPercent,
       waterLevel: dp.chambers[id].waterLevel,
       timestamp: dp.timestamp,
+      batteryParams: dp.chambers[id].batteryParams,
     });
     if (historyData[id].length > 100) {
       historyData[id] = historyData[id].slice(-100);

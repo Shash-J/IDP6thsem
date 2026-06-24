@@ -32,7 +32,7 @@ const INTERVAL_MINUTES = 5;
 const HOURS = 24;
 const TOTAL_POINTS = (HOURS * 60) / INTERVAL_MINUTES; // 288
 
-const startTime = new Date('2026-05-07T08:00:00+05:30');
+const startTime = new Date('2026-05-08T08:00:00+05:30');
 
 function getStatus(percent, filling) {
   if (filling) return 'Filling';

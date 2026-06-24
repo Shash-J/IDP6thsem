@@ -13,9 +13,9 @@ import { CHAMBER_NAMES, CHART_COLORS, formatTime } from '../utils/helpers';
 import { MdShowChart } from 'react-icons/md';
 
 /**
- * Custom Tooltip for the water level chart
+ * Custom Tooltip for the chart
  */
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, unit }) => {
   if (!active || !payload?.length) return null;
 
   return (
@@ -25,20 +25,30 @@ const CustomTooltip = ({ active, payload, label }) => {
         <div key={entry.name} className="flex items-center gap-2 text-xs mb-1">
           <div className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
           <span className="text-slate-400">{entry.name}:</span>
-          <span className="text-slate-200 font-semibold font-mono">{entry.value?.toFixed(1)}%</span>
+          <span className="text-slate-200 font-semibold font-mono">
+            {entry.value?.toFixed(1)}{unit}
+          </span>
         </div>
       ))}
     </div>
   );
 };
 
+const METRICS = [
+  { id: 'waterPercent', label: 'Water Level', unit: '%', domain: [0, 100] },
+  { id: 'voltage', label: 'Voltage', unit: 'V', domain: ['auto', 'auto'] },
+  { id: 'current', label: 'Current', unit: 'A', domain: ['auto', 'auto'] },
+  { id: 'temperature', label: 'Temperature', unit: '°C', domain: ['auto', 'auto'] },
+  { id: 'stateOfCharge', label: 'State of Charge', unit: '%', domain: [0, 100] },
+];
+
 /**
  * WaterChart Component
- * Real-time area chart displaying water levels over time for all chambers.
+ * Real-time area chart displaying various metrics over time for all chambers.
  */
 const WaterChart = ({ history, chambers }) => {
   const [timeRange, setTimeRange] = useState('6h');
-  const [selectedChambers, setSelectedChambers] = useState(null); // null = all
+  const [selectedMetric, setSelectedMetric] = useState(METRICS[0]);
 
   const chartData = useMemo(() => {
     if (!history || !chambers) return [];
@@ -57,11 +67,17 @@ const WaterChart = ({ history, chambers }) => {
       const point = { time: formatTime(entry.timestamp) };
       chamberIds.forEach((id) => {
         const historyEntry = history[id]?.[history[id].length - maxPoints + idx];
-        point[chambers[id]?.name || CHAMBER_NAMES[id] || id] = historyEntry?.waterPercent || 0;
+        let val = 0;
+        if (selectedMetric.id === 'waterPercent') {
+          val = historyEntry?.waterPercent;
+        } else {
+          val = historyEntry?.batteryParams?.[selectedMetric.id];
+        }
+        point[chambers[id]?.name || CHAMBER_NAMES[id] || id] = val || 0;
       });
       return point;
     });
-  }, [history, chambers, timeRange]);
+  }, [history, chambers, timeRange, selectedMetric]);
 
   const activeChambers = useMemo(() => {
     if (!chambers) return [];
@@ -83,32 +99,51 @@ const WaterChart = ({ history, chambers }) => {
   return (
     <div className="glass-card p-5" id="water-chart">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
             <MdShowChart className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-200">Water Level Trends</h3>
+            <h3 className="text-sm font-semibold text-slate-200">System Analytics</h3>
             <p className="text-[10px] text-slate-500 uppercase tracking-wider">Real-time monitoring</p>
           </div>
         </div>
 
-        {/* Time Range Buttons */}
-        <div className="flex items-center gap-1 bg-black/20 rounded-lg p-1">
-          {ranges.map((r) => (
-            <button
-              key={r.value}
-              onClick={() => setTimeRange(r.value)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                timeRange === r.value
-                  ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30'
-                  : 'text-slate-500 hover:text-slate-300'
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          {/* Metric Selector */}
+          <div className="flex items-center gap-1 bg-black/20 rounded-lg p-1 overflow-x-auto max-w-full">
+            {METRICS.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => setSelectedMetric(m)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  selectedMetric.id === m.id
+                    ? 'bg-gradient-to-r from-purple-500/20 to-violet-500/20 text-purple-400 border border-purple-500/30'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Time Range Buttons */}
+          <div className="flex items-center gap-1 bg-black/20 rounded-lg p-1 shrink-0">
+            {ranges.map((r) => (
+              <button
+                key={r.value}
+                onClick={() => setTimeRange(r.value)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  timeRange === r.value
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -134,14 +169,14 @@ const WaterChart = ({ history, chambers }) => {
                 axisLine={false}
               />
               <YAxis
-                domain={[0, 100]}
+                domain={selectedMetric.domain}
                 stroke="rgba(255,255,255,0.1)"
                 tick={{ fontSize: 10, fill: '#64748b' }}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(v) => `${v}%`}
+                tickFormatter={(v) => `${v}${selectedMetric.unit}`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip unit={selectedMetric.unit} />} />
               <Legend
                 wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }}
                 iconType="circle"

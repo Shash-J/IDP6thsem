@@ -1,84 +1,73 @@
+import * as demoService from './demoData.js';
+import * as esp32Service from './esp32Service.js';
+
 /**
- * Data Service Router
- * Routes between Firebase and Demo data based on environment config.
- * Uses synchronous conditional import to avoid top-level await issues.
+ * Get the active data source ('demo' or 'esp32').
+ * Defaults to 'esp32'.
  */
-
-const useDemoData = import.meta.env.VITE_USE_DEMO_DATA === 'true';
-
-// Dynamic re-exports based on environment
-// We use a lazy-init pattern to avoid top-level await
-let _service = null;
-
-const getService = async () => {
-  if (_service) return _service;
-  if (useDemoData) {
-    _service = await import('./demoData.js');
-  } else {
-    _service = await import('../firebase/service.js');
-  }
-  return _service;
+export const getActiveSource = () => {
+  return localStorage.getItem('data_source') || 'esp32';
 };
 
+/**
+ * Set the active data source.
+ * @param {string} source - 'demo' or 'esp32'
+ */
+export const setActiveSource = (source) => {
+  if (source === 'demo' || source === 'esp32') {
+    localStorage.setItem('data_source', source);
+  }
+};
+
+/**
+ * Get the active service instance dynamically.
+ */
+const getService = () => {
+  const source = getActiveSource();
+  if (source === 'demo') {
+    return demoService;
+  }
+  return esp32Service;
+};
+
+// ─── Real-time Subscriptions ─────────────────────────────────────────
+
 export const subscribeToChambers = (callback) => {
-  getService().then((s) => s.subscribeToChambers(callback));
-  // Return a cleanup function
-  return () => {
-    getService().then((s) => {
-      // Re-subscribe to get the unsub function, then call it
-      // In practice, the subscription is already active
-    });
-  };
+  return getService().subscribeToChambers(callback);
 };
 
 export const subscribeToPump = (callback) => {
-  let unsub = null;
-  getService().then((s) => {
-    unsub = s.subscribeToPump(callback);
-  });
-  return () => unsub?.();
+  return getService().subscribeToPump(callback);
 };
 
 export const subscribeToSystem = (callback) => {
-  let unsub = null;
-  getService().then((s) => {
-    unsub = s.subscribeToSystem(callback);
-  });
-  return () => unsub?.();
+  return getService().subscribeToSystem(callback);
 };
 
 export const subscribeToAlerts = (callback) => {
-  let unsub = null;
-  getService().then((s) => {
-    unsub = s.subscribeToAlerts(callback);
-  });
-  return () => unsub?.();
+  return getService().subscribeToAlerts(callback);
 };
 
 export const subscribeToHistory = (callback) => {
-  let unsub = null;
-  getService().then((s) => {
-    unsub = s.subscribeToHistory(callback);
-  });
-  return () => unsub?.();
+  return getService().subscribeToHistory(callback);
 };
 
+// ─── Action Controllers ──────────────────────────────────────────────
+
 export const setPumpStatus = async (status) => {
-  const s = await getService();
-  return s.setPumpStatus(status);
+  return getService().setPumpStatus(status);
 };
 
 export const setValveStatus = async (chamberId, valveState) => {
-  const s = await getService();
-  return s.setValveStatus(chamberId, valveState);
+  return getService().setValveStatus(chamberId, valveState);
 };
 
 export const setSystemMode = async (mode) => {
-  const s = await getService();
-  return s.setSystemMode(mode);
+  return getService().setSystemMode(mode);
 };
 
 export const setChamberOnline = async (chamberId, isOnline) => {
-  const s = await getService();
-  return s.setChamberOnline?.(chamberId, isOnline);
+  if (getService().setChamberOnline) {
+    return getService().setChamberOnline(chamberId, isOnline);
+  }
 };
