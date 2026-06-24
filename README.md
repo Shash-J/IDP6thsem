@@ -1,23 +1,21 @@
 # BatteryGuard — Lead-Acid Battery Water Level Management System
 
-A professional IoT dashboard built with React + Vite for real-time monitoring and control of lead-acid battery water refill chambers. Designed for industrial environments using ESP32 microcontrollers and ultrasonic sensors.
-
-![Dashboard Preview](docs/preview.png)
+A professional, local IoT dashboard built with React + Vite for real-time monitoring and control of lead-acid battery water refill chambers. Designed to operate **entirely offline on your Local Area Network (LAN)**, connecting directly to ESP32 microcontrollers with ultrasonic level sensors and battery parameters, without any cloud dependencies.
 
 ---
 
 ## ✨ Features
 
-- **Real-time Chamber Monitoring** — Live water level percentages, status indicators, and animated water fills for 6 battery chambers
-- **Interactive Charts** — Recharts-powered area chart with time range selection (1H / 6H / 24H)
-- **Pump Control** — Toggle the primary refill pump ON/OFF with animated status indicator
-- **Valve Management** — Per-chamber valve toggle switches with live state display
-- **System Mode** — AUTO/MANUAL mode toggle with safety cutoff indicators
-- **Alert Panel** — Color-coded system alerts (warnings, errors, info, success)
-- **Responsive Design** — Works on desktop, tablet, and mobile devices
-- **Dark Theme** — Professional IoT-style glassmorphism UI
-- **Demo Mode** — Built-in simulated data for development and demonstrations
-- **Firebase Integration** — Real-time database sync when connected to Firebase
+- **Non-Scrollable Cockpit SCADA Grid** — High-density, professional layout that fits entirely on a single screen without scrolling on desktop.
+- **Direct local ESP32 Polling** — Real-time telemetry fetched directly from your ESP32's local IP address (default: `192.168.135.31`) every 3 seconds.
+- **Frontend Metric Calculations** — Converts raw ultrasonic sensor distance readings (`distanceCm`) into `waterLevel` and `waterPercent` in real-time, simplifying ESP32 code.
+- **Chamber Filtering** — Restrained UI to monitor exactly **2 active chambers** (Chamber A-1 and Chamber A-2), matching the physical dual-tank hardware setup.
+- **Dynamic Connection Settings** — Interactive settings modal accessible via the header gear icon allowing you to swap between Live ESP32 and Demo modes, configure the IP, and **Test Connection** with live diagnostics.
+- **Browser-Side Machine Learning** — Exposes a custom-trained Linear Regression model running locally in the browser to forecast:
+  - **State of Health (SoH %)**: Battery capacity fade relative to new state.
+  - **Remaining Useful Life (RUL in Days)**: Days left before SoH drops below 80%.
+  - **Sulfation Index (%)**: Estimates lead sulfate crystal buildup on battery plates.
+- **What-If Stress Simulator** — Real-time slider console on the Predictions page that allows you to manually stress-test parameters (voltage, current, temp, resistance, specific gravity) to see immediate model forecasts.
 
 ---
 
@@ -27,114 +25,101 @@ A professional IoT dashboard built with React + Vite for real-time monitoring an
 | -------------- | -------------------------------- |
 | React 19       | UI Framework                     |
 | Vite 8         | Build Tool & Dev Server          |
-| Tailwind CSS 4 | Utility-first Styling            |
-| Firebase RTDB  | Real-time Database               |
-| Recharts       | Data Visualization               |
-| react-hot-toast | Toast Notifications             |
-| react-icons    | Icon Library                     |
+| Tailwind CSS 4 | SCADA Glassmorphic Styling       |
+| Recharts       | Analytics & Decay Graphing       |
+| react-hot-toast| Status Toast Notifications       |
+| NumPy / Python | ML Model OLS Training            |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-src/
-├── components/         # Reusable UI components
-│   ├── Header.jsx
-│   ├── Sidebar.jsx
-│   ├── TankCard.jsx
-│   ├── PumpStatus.jsx
-│   ├── ValveControl.jsx
-│   ├── WaterChart.jsx
-│   ├── AlertPanel.jsx
-│   ├── ManualControls.jsx
-│   ├── SystemOverview.jsx
-│   └── LoadingSkeleton.jsx
-├── pages/
-│   └── Dashboard.jsx   # Main dashboard page
-├── services/
-│   ├── dataService.js  # Service router (Firebase/Demo)
-│   └── demoData.js     # Simulated real-time data
-├── firebase/
-│   ├── config.js       # Firebase initialization
-│   ├── service.js      # Firebase CRUD operations
-│   └── index.js        # Barrel exports
-├── hooks/
-│   └── useFirebase.js  # Custom React hooks
-├── utils/
-│   └── helpers.js      # Utility functions
-├── App.jsx             # Root component
-├── main.jsx            # Entry point
-└── index.css           # Global styles & design tokens
+├── esp_code.ino        # CORS-enabled ESP32 Web Server Firmware
+├── scripts/
+│   └── train_battery_ml.py   # OLS Linear Regression training pipeline
+├── src/
+│   ├── components/     # High-density UI controls & widgets
+│   ├── pages/
+│   │   ├── Dashboard.jsx     # Non-scrollable SCADA cockpit page
+│   │   └── Predictions.jsx   # Machine Learning predictions & Simulator
+│   ├── services/
+│   │   ├── dataService.js    # Data routing layer (ESP32 vs. Demo)
+│   │   └── esp32Service.js   # HTTP client with in-memory history & alerts
+│   ├── utils/
+│   │   └── mlInference.js    # Browser-side ML regression engine
+│   ├── App.jsx         # App router and shell layout
+│   └── index.css       # Design tokens & glassmorphism styling
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js 18+ and npm
-
-### Installation
+### 1. Installation
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd idp_webpage
-
-# Install dependencies
+# Install NPM dependencies
 npm install
 
-# Start development server
+# Start the Vite local development server
 npm run dev
 ```
 
-The app starts in **demo mode** by default — no Firebase credentials needed.
+The application will be served locally at: [http://localhost:5173/](http://localhost:5173/)
 
-### Environment Variables
+### 2. Machine Learning Training
 
-Copy `.env.example` to `.env` and configure:
+If you accumulate custom battery telemetry logs and want to retrain the forecasting models:
 
-```env
-# Set to 'true' for demo data, 'false' for Firebase
-VITE_USE_DEMO_DATA=true
-
-# Firebase config (only needed when VITE_USE_DEMO_DATA=false)
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.firebaseio.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-VITE_FIREBASE_APP_ID=your-app-id
+```bash
+# Run the NumPy OLS training script
+python scripts/train_battery_ml.py
 ```
+
+This script will read `src/data/battery_timeseries.json`, fit linear regression parameters, and export the coefficients directly to `src/data/battery_ml_model.json`, which the React app immediately loads for browser-side predictions.
 
 ---
 
-## 🔥 Firebase Setup
+## 🔌 ESP32 REST API Contract
 
-### Expected Database Structure
+The ESP32 microcontroller must expose the following local network endpoints:
 
+### 1. Telemetry API: `GET /data`
+Should return CORS headers (`Access-Control-Allow-Origin: *`) and the JSON telemetry object:
 ```json
 {
   "chambers": {
     "tank1": {
-      "waterPercent": 72,
-      "waterLevel": 14,
-      "status": "Normal",
-      "valve": true
+      "name": "Chamber A-1",
+      "distanceCm": 4.5,
+      "valve": false,
+      "batteryParams": {
+        "voltage": 12.42,
+        "current": 4.5,
+        "temperature": 30.5,
+        "specificGravity": 1.245,
+        "internalResistance": 5.2,
+        "stateOfCharge": 82.5
+      }
     },
     "tank2": {
-      "waterPercent": 20,
-      "waterLevel": 4,
-      "status": "Low",
-      "valve": false
+      "name": "Chamber A-2",
+      "distanceCm": 14.8,
+      "valve": true,
+      "batteryParams": {
+        "voltage": 11.95,
+        "current": 3.6,
+        "temperature": 34.2,
+        "specificGravity": 1.215,
+        "internalResistance": 5.7,
+        "stateOfCharge": 69.0
+      }
     }
   },
   "pump": {
-    "status": true,
-    "lastUpdated": "2025-05-08T10:00:00Z"
+    "status": false,
+    "lastUpdated": "2026-06-24T11:06:26Z"
   },
   "system": {
     "mode": "AUTO"
@@ -142,51 +127,16 @@ VITE_FIREBASE_APP_ID=your-app-id
 }
 ```
 
-### Connecting to Firebase
+### 2. Control API: `POST /control`
+Receives control adjustments from the dashboard:
+- Mode change: `{"mode": "MANUAL"}`
+- Pump control (Manual only): `{"pump": true}`
+- Valve control: `{"chamberId": "tank1", "valve": true}`
 
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable Realtime Database
-3. Copy your config credentials to `.env`
-4. Set `VITE_USE_DEMO_DATA=false`
-5. Restart the dev server
-
----
-
-## 📦 Build & Deploy
-
-### Production Build
-
-```bash
-npm run build
-```
-
-Output is in the `dist/` directory.
-
-### Deploy to Vercel
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-Or connect your GitHub repo to [vercel.com](https://vercel.com) for automatic deployments.
-
----
-
-## 🏗 ESP32 Integration
-
-This dashboard is designed to receive data from ESP32 microcontrollers with ultrasonic sensors. The ESP32 firmware should:
-
-1. Read water level from HC-SR04 ultrasonic sensors
-2. Calculate water percentage based on tank dimensions
-3. Push data to Firebase Realtime Database
-4. Listen for pump/valve control commands from Firebase
+*CORS preflight demands that the ESP32 must also respond with `204 No Content` to HTTP `OPTIONS` requests sent to both routes.*
 
 ---
 
 ## 📜 License
 
-MIT License — feel free to use for any purpose.
+MIT License — feel free to use and adapt this for local SCADA and industrial IoT testing.

@@ -97,16 +97,16 @@ const WaterChart = ({ history, chambers }) => {
   ];
 
   return (
-    <div className="glass-card p-5" id="water-chart">
+    <div className="glass-card p-5 h-full flex flex-col" id="water-chart">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5 shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
             <MdShowChart className="w-5 h-5 text-purple-400" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-200">System Analytics</h3>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Real-time monitoring</p>
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Real-time monitoring</p>
           </div>
         </div>
 
@@ -148,7 +148,7 @@ const WaterChart = ({ history, chambers }) => {
       </div>
 
       {/* Chart */}
-      <div className="h-[280px] md:h-[320px]">
+      <div className="flex-1 min-h-0">
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
