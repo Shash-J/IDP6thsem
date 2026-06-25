@@ -122,3 +122,32 @@ The current model is initialized with the following OLS-trained weights:
 | **Sulfation (%)**| $+154.218$| $-3.2147$ | $+0.8412$ | $+0.1874$ | $+4.4891$  | $-100.2487$ |
 
 *Note: Positive coefficients indicate a positive correlation (e.g., higher Specific Gravity increases SoH), while negative coefficients indicate an inverse correlation (e.g., higher Internal Resistance reduces SoH).*
+
+---
+
+## 🌐 Recommended Public Datasets for Model Initialization
+
+Since lead-acid battery testing with specific gravity is highly specialized and often proprietary, finding open-source datasets containing all five of our features is rare. However, you can initialize or validate your ML model weights using the following established public datasets:
+
+### 1. NASA Ames Prognostics Data Repository
+- **Chemistry**: Lithium-ion (primarily, but cycle-aging physics are highly generalizable).
+- **Features Included**: Voltage, Current, Temperature, and Internal Resistance (via EIS impedance measurements).
+- **Best Use Case**: Calibrating the relationships between **internal resistance growth** and **State of Health (SoH)**, and verifying temperature-related wear rates.
+- **Link**: [NASA Battery Dataset](https://www.nasa.gov/content/prognostics-center-of-excellence-data-set-repository)
+
+### 2. CALCE Battery Database (University of Maryland)
+- **Features Included**: High-frequency charge-discharge current, voltage, temperature, and degradation cycles.
+- **Best Use Case**: Modeling capacity fade curves and validating the Remaining Useful Life (RUL) estimation equations.
+- **Link**: [CALCE Battery Research](https://calce.umd.edu/battery-data)
+
+### 3. Oxford Battery Degradation Dataset
+- **Features Included**: Long-term degradation profiles of battery cells cycled under thermal chambers.
+- **Best Use Case**: Tuning the coefficients related to thermal aging (Arrhenius-style wear).
+- **Link**: [Oxford Battery Dataset](https://ora.ox.ac.uk/)
+
+### 4. Community Lead-Acid Cycling Datasets
+- **Features Included**: Time-series current, voltage, and temperature data for lead-acid charge/discharge sequences.
+- **Best Use Case**: Extracting internal resistance changes by calculating voltage drops under current pulses:
+  $$R_{\text{internal}} = \frac{V_{\text{no-load}} - V_{\text{load}}}{I}$$
+- **Link**: Search GitHub or Kaggle for repositories like `vmehra813/lead_acid_battery_data`.
+
