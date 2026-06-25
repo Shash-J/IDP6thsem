@@ -15,7 +15,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <div className={`flex bg-[#0a0e1a] ${activeTab === 'dashboard' ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+    <div className="flex bg-[#0a0e1a] h-screen overflow-hidden">
       {/* Toast Notifications */}
       <Toaster
         position="top-right"
@@ -40,9 +40,9 @@ function App() {
       />
 
       {/* Main Content — always full width */}
-      <div className={`flex-1 flex flex-col w-full ${activeTab === 'dashboard' ? 'h-full min-h-0 overflow-hidden' : 'min-h-screen'}`}>
+      <div className="flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden">
         <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
-        <main className={`flex-1 p-4 md:p-6 lg:p-8 ${activeTab === 'dashboard' ? 'min-h-0 overflow-hidden flex flex-col' : ''}`}>
+        <main className="flex-1 p-4 md:p-6 lg:p-8 min-h-0 overflow-hidden flex flex-col">
           {activeTab === 'dashboard' ? <Dashboard /> : <Predictions />}
         </main>
       </div>
