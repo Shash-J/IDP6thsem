@@ -39,6 +39,8 @@ bool battery2Low = false;
 
 String valve1 = "CLOSED";
 String valve2 = "CLOSED";
+String lastValve1 = "";
+String lastValve2 = "";
 
 String pumpStatus = "OFF";
 String systemMode = "AUTO"; // Dynamic system mode (AUTO / MANUAL)
@@ -217,8 +219,16 @@ void setup()
 
   pinMode(RELAY_PIN, OUTPUT);
 
-  servo1.attach(SERVO1_PIN);
-  servo2.attach(SERVO2_PIN);
+  // ESP32Servo PWM Timer Allocation to prevent jitter
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  servo1.setPeriodHertz(50); // Standard 50Hz servo
+  servo2.setPeriodHertz(50); // Standard 50Hz servo
+
+  servo1.attach(SERVO1_PIN, 500, 2400);
+  servo2.attach(SERVO2_PIN, 500, 2400);
 
   servo1.write(0);
   servo2.write(0);
@@ -304,23 +314,31 @@ void loop()
   // --- HARDWARE WRITES (Runs in both AUTO and MANUAL) ---
   
   // Servo 1 write
-  if (valve1 == "OPEN")
+  if (valve1 != lastValve1)
   {
-    servo1.write(90);
-  }
-  else
-  {
-    servo1.write(0);
+    if (valve1 == "OPEN")
+    {
+      servo1.write(90);
+    }
+    else
+    {
+      servo1.write(0);
+    }
+    lastValve1 = valve1;
   }
 
   // Servo 2 write
-  if (valve2 == "OPEN")
+  if (valve2 != lastValve2)
   {
-    servo2.write(90);
-  }
-  else
-  {
-    servo2.write(0);
+    if (valve2 == "OPEN")
+    {
+      servo2.write(90);
+    }
+    else
+    {
+      servo2.write(0);
+    }
+    lastValve2 = valve2;
   }
 
   // Relay (Active LOW - Relay turns ON when write is LOW)

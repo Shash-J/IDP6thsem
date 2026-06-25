@@ -20,9 +20,9 @@ const AlertPanel = ({ alerts }) => {
   const alertList = Array.isArray(alerts) ? alerts : [];
 
   return (
-    <div className="glass-card p-5" id="alert-panel">
+    <div className="glass-card p-5 h-full flex flex-col" id="alert-panel">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-5 shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
             <MdNotificationsActive className="w-5 h-5 text-amber-400" />
@@ -43,7 +43,7 @@ const AlertPanel = ({ alerts }) => {
       </div>
 
       {/* Alert List */}
-      <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-2">
         {alertList.length === 0 ? (
           <div className="text-center py-8 text-slate-600 text-sm">
             <IoCheckmarkCircleOutline className="w-8 h-8 mx-auto mb-2 text-emerald-600" />

@@ -79,7 +79,7 @@ const Dashboard = () => {
     : [];
 
   return (
-    <div className="lg:h-[calc(100vh-130px)] flex flex-col gap-4 overflow-hidden">
+    <div className="flex-1 flex flex-col gap-4 overflow-hidden min-h-0">
       {/* Title & Info Block */}
       <div className="shrink-0">
         <h1 className="text-xl md:text-2xl font-bold text-slate-100">
@@ -115,7 +115,7 @@ const Dashboard = () => {
           </div>
           
           {/* Recharts Analytics Chart (fills remaining space) */}
-          <div className="flex-1 min-h-[220px]">
+          <div className="flex-1 min-h-0">
             <WaterChart history={history} chambers={chambers} />
           </div>
         </div>
