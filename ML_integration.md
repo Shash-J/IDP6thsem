@@ -139,6 +139,7 @@ Since lead-acid battery testing with specific gravity is highly specialized and 
 - **Features Included**: High-frequency charge-discharge current, voltage, temperature, and degradation cycles.
 - **Best Use Case**: Modeling capacity fade curves and validating the Remaining Useful Life (RUL) estimation equations.
 - **Link**: [CALCE Battery Research](https://calce.umd.edu/battery-data)
+- **Local Sample Files**: Stored locally in your project at [calce_dataset/CS2_35.csv](file:///c:/Users/Shashanka/Desktop/idp_webpage/calce_dataset/CS2_35.csv) and [calce_dataset/CS2_36.csv](file:///c:/Users/Shashanka/Desktop/idp_webpage/calce_dataset/CS2_36.csv). These contain cycle index, capacity, SoH ratios, and internal resistance columns, serving as direct empirical validation for your ML degradation curves.
 
 ### 3. Oxford Battery Degradation Dataset
 - **Features Included**: Long-term degradation profiles of battery cells cycled under thermal chambers.
