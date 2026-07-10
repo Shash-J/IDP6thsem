@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label, unit }) => {
 };
 
 const METRICS = [
-  { id: 'waterPercent', label: 'Water Level', unit: '%', domain: [0, 100] },
+  { id: 'waterPercent', label: 'Electrolyte Level', unit: '%', domain: [0, 100] },
   { id: 'voltage', label: 'Voltage', unit: 'V', domain: ['auto', 'auto'] },
   { id: 'current', label: 'Current', unit: 'A', domain: ['auto', 'auto'] },
   { id: 'temperature', label: 'Temperature', unit: '°C', domain: ['auto', 'auto'] },

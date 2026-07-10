@@ -13,7 +13,7 @@ import {
   Tooltip,
   ReferenceLine
 } from 'recharts';
-import { MdScience, MdTrendingDown, MdFlashOn, MdSpeed, MdThermostat, MdWarning } from 'react-icons/md';
+import { MdScience, MdTrendingDown, MdFlashOn, MdSpeed, MdThermostat, MdWarning, MdOutlineWaterDrop } from 'react-icons/md';
 
 const Predictions = () => {
   const { chambers, loading } = useChambers();
@@ -27,6 +27,7 @@ const Predictions = () => {
   const [simTemp, setSimTemp] = useState(28.0);
   const [simResistance, setSimResistance] = useState(5.0);
   const [simGravity, setSimGravity] = useState(1.24);
+  const [simElectrolyte, setSimElectrolyte] = useState(100);
 
   // Filter out inactive chambers
   const activeChambers = useMemo(() => {
@@ -46,7 +47,7 @@ const Predictions = () => {
   const livePredictions = useMemo(() => {
     if (!selectedChamber || !selectedChamber.batteryParams) {
       // Fallback standard prediction if telemetry loading
-      return predictBatteryMetrics(12.3, 4.0, 30.0, 5.2, 1.24);
+      return predictBatteryMetrics(12.3, 4.0, 30.0, 5.2, 1.24, 100);
     }
     const bp = selectedChamber.batteryParams;
     return predictBatteryMetrics(
@@ -54,14 +55,15 @@ const Predictions = () => {
       bp.current,
       bp.temperature,
       bp.internalResistance,
-      bp.specificGravity
+      bp.specificGravity,
+      selectedChamber.waterPercent ?? 100
     );
   }, [selectedChamber]);
 
   // What-If predictions
   const simulatedPredictions = useMemo(() => {
-    return predictBatteryMetrics(simVoltage, simCurrent, simTemp, simResistance, simGravity);
-  }, [simVoltage, simCurrent, simTemp, simResistance, simGravity]);
+    return predictBatteryMetrics(simVoltage, simCurrent, simTemp, simResistance, simGravity, simElectrolyte);
+  }, [simVoltage, simCurrent, simTemp, simResistance, simGravity, simElectrolyte]);
 
   // Future Decay Curve Projection (180 Days)
   // Calculates expected capacity fade under current operating temperatures
@@ -138,6 +140,7 @@ const Predictions = () => {
                 setSimTemp(bp.temperature);
                 setSimResistance(bp.internalResistance);
                 setSimGravity(bp.specificGravity);
+                setSimElectrolyte(chamber.waterPercent ?? 100);
               }
             }}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
@@ -320,6 +323,23 @@ const Predictions = () => {
                   step="0.005"
                   value={simGravity}
                   onChange={(e) => setSimGravity(parseFloat(e.target.value))}
+                  className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                />
+              </div>
+
+              {/* Electrolyte Level Slider */}
+              <div className="space-y-0.5">
+                <div className="flex justify-between text-[11px] font-medium">
+                  <span className="text-slate-400 flex items-center gap-1"><MdOutlineWaterDrop className="text-cyan-400" /> Electrolyte Level</span>
+                  <span className="text-slate-300 font-mono font-bold">{simElectrolyte.toFixed(0)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={simElectrolyte}
+                  onChange={(e) => setSimElectrolyte(parseInt(e.target.value))}
                   className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                 />
               </div>

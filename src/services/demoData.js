@@ -83,6 +83,10 @@ alertsData = datasetAlerts
     const currentTime = new Date(timeseries[currentIndex - 1].timestamp).getTime();
     return alertTime <= currentTime && (a.chamber === null || ACTIVE_CHAMBERS.includes(a.chamber));
   })
+  .map((a) => ({
+    ...a,
+    message: a.message.replace(/water level/gi, 'electrolyte level')
+  }))
   .slice(-5);
 
 // ─── Subscriber storage ──────────────────────────────────────────────
@@ -138,7 +142,10 @@ setInterval(() => {
   // Check for new alerts (only for active chambers or system alerts)
   const newAlerts = datasetAlerts.filter(
     (a) => a.timestamp === dp.timestamp && (a.chamber === null || ACTIVE_CHAMBERS.includes(a.chamber))
-  );
+  ).map((a) => ({
+    ...a,
+    message: a.message.replace(/water level/gi, 'electrolyte level')
+  }));
   if (newAlerts.length > 0) {
     alertsData = [...newAlerts, ...alertsData].slice(0, 10);
     notify('alerts');

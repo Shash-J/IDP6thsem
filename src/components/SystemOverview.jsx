@@ -24,7 +24,7 @@ const SystemOverview = ({ chambers, pump, system }) => {
 
     return [
       {
-        label: 'Avg. Water Level',
+        label: 'Avg. Electrolyte Level',
         value: `${avgLevel.toFixed(1)}%`,
         icon: MdOutlineWaterDrop,
         color: 'from-cyan-500 to-blue-500',

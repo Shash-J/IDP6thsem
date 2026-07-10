@@ -143,7 +143,8 @@ const fetchTelemetry = async () => {
             bp.current,
             bp.temperature,
             bp.internalResistance,
-            bp.specificGravity
+            bp.specificGravity,
+            waterPercent
           );
         }
 
@@ -157,11 +158,11 @@ const fetchTelemetry = async () => {
 
         // Trigger alerts independently of status badge
         if (waterPercent < 30) {
-          addAlert('warning', `${espChamber.name || id} water level is low (${waterPercent}%)!`, id);
+          addAlert('warning', `${espChamber.name || id} electrolyte level is low (${waterPercent}%)!`, id);
         }
 
         if (espChamber.valve && waterPercent >= 95) {
-          addAlert('success', `${espChamber.name || id} water refill completed (${waterPercent}%)!`, id);
+          addAlert('success', `${espChamber.name || id} electrolyte refill completed (${waterPercent}%)!`, id);
         }
 
         chamberData[id] = {

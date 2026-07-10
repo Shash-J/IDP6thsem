@@ -1,6 +1,6 @@
-# BatteryGuard — Lead-Acid Battery Water Level Management System
+# BatteryGuard — Lead-Acid Battery Electrolyte Level Management System
 
-A professional, local IoT dashboard built with React + Vite for real-time monitoring and control of lead-acid battery water refill chambers. Designed to operate **entirely offline on your Local Area Network (LAN)**, connecting directly to ESP32 microcontrollers with ultrasonic level sensors and battery parameters, without any cloud dependencies.
+A professional, local IoT dashboard built with React + Vite for real-time monitoring and control of lead-acid battery electrolyte refill chambers. Designed to operate **entirely offline on your Local Area Network (LAN)**, connecting directly to ESP32 microcontrollers with ultrasonic level sensors and battery parameters, without any cloud dependencies.
 
 ---
 
@@ -8,7 +8,7 @@ A professional, local IoT dashboard built with React + Vite for real-time monito
 
 - **Non-Scrollable Cockpit SCADA Grid** — High-density, professional layout that fits entirely on a single screen without scrolling on desktop.
 - **Direct local ESP32 Polling** — Real-time telemetry fetched directly from your ESP32's local IP address (default: `192.168.135.31`) every 3 seconds.
-- **Frontend Metric Calculations** — Converts raw ultrasonic sensor distance readings (`distanceCm`) into `waterLevel` and `waterPercent` in real-time, simplifying ESP32 code.
+- **Frontend Metric Calculations** — Converts raw ultrasonic sensor distance readings (`distanceCm`) into `waterLevel` and `waterPercent` (electrolyte levels) in real-time, simplifying ESP32 code.
 - **Chamber Filtering** — Restrained UI to monitor exactly **2 active chambers** (Chamber A-1 and Chamber A-2), matching the physical dual-tank hardware setup.
 - **Dynamic Connection Settings** — Interactive settings modal accessible via the header gear icon allowing you to swap between Live ESP32 and Demo modes, configure the IP, and **Test Connection** with live diagnostics.
 - **Browser-Side Machine Learning** — Exposes a custom-trained Linear Regression model running locally in the browser to forecast:

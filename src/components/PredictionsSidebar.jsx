@@ -22,14 +22,14 @@ export const PredictionsSidebar = ({ chamber, predictions }) => {
     const bp = chamber.batteryParams || {};
     const list = [];
 
-    // 1. Electrolyte / Water Level Insight
+    // 1. Electrolyte Level Insight
     const waterPct = chamber.waterPercent ?? 0;
     if (waterPct < 15) {
       list.push({
         category: 'ELECTROLYTE',
         status: 'CRITICAL',
         title: 'Dry Cell Warning',
-        message: `Water level is critical (${waterPct.toFixed(0)}%). Plates are dangerously exposed. Refill immediately to prevent plate oxidation.`,
+        message: `Electrolyte level is critical (${waterPct.toFixed(0)}%). Plates are dangerously exposed. Refill immediately to prevent plate oxidation.`,
         color: 'text-red-400 border-red-500/20 bg-red-500/5',
         icon: IoCloseCircleOutline
       });
@@ -37,8 +37,8 @@ export const PredictionsSidebar = ({ chamber, predictions }) => {
       list.push({
         category: 'ELECTROLYTE',
         status: 'WARNING',
-        title: 'Low Water Level',
-        message: `Water level is low (${waterPct.toFixed(0)}%). Solenoid valve should open to replenish electrolyte levels.`,
+        title: 'Low Electrolyte Level',
+        message: `Electrolyte level is low (${waterPct.toFixed(0)}%). Solenoid valve should open to replenish electrolyte levels.`,
         color: 'text-amber-400 border-amber-500/20 bg-amber-500/5',
         icon: IoWarningOutline
       });
@@ -47,7 +47,7 @@ export const PredictionsSidebar = ({ chamber, predictions }) => {
         category: 'ELECTROLYTE',
         status: 'NOMINAL',
         title: 'Electrolyte Stable',
-        message: `Water level is healthy (${waterPct.toFixed(0)}%). Plates are fully submerged in solution.`,
+        message: `Electrolyte level is healthy (${waterPct.toFixed(0)}%). Plates are fully submerged in solution.`,
         color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5',
         icon: IoCheckmarkCircleOutline
       });

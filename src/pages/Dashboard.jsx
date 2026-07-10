@@ -86,7 +86,7 @@ const Dashboard = () => {
           Battery Refill <span className="gradient-text">Dashboard</span>
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Real-time monitoring and control for lead-acid battery water level management
+          Real-time monitoring and control for lead-acid battery electrolyte level management
         </p>
       </div>
 
