@@ -1,0 +1,89 @@
+# Unified Client Onboarding & Edge Camera Provisioning System
+
+As TuringSight transitions to a mass-deployable Deep Tech platform, manual provisioning of individual camera configuration files (`.env`, `manifest.yaml`), AWS IoT Core mTLS X.509 certificates, policies, and Docker environments becomes a significant bottleneck.
+
+We need a reliable, seamless, and automated system to onboard new clients, register cameras, generate mTLS certificates, provision policies, and output a packaged, deployable edge bundle (`deploy_<camera_id>.zip`).
+
+---
+
+## 📐 System Architecture & Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Deployment Engineer / Admin API
+    participant DBReg as DynamoDB: Camera-Registry
+    participant DBPerm as DynamoDB: User-Cameras
+    participant IoT as AWS IoT Core (ap-south-1)
+    participant FS as Local Filesystem / Packer
+    
+    Note over Admin, DBPerm: Phase 1: Database Registration
+    Admin->>DBReg: Register camera metadata & RTSP URL (cam_id)
+    Admin->>DBPerm: Map camera_id to User Cognito ID (user_id)
+
+    Note over Admin, IoT: Phase 2: mTLS Credentials Provisioning
+    Admin->>IoT: Call create_keys_and_certificate(setAsActive=True)
+    IoT-->>Admin: Return PEM certificate & Private Key contents
+    Admin->>IoT: Attach TuringSightEdgePolicy to the new certificate ARN
+
+    Note over Admin, FS: Phase 3: Config Generation & Packaging
+    Admin->>FS: Write certificate.pem and private.key files
+    Admin->>FS: Copy AmazonRootCA1.pem
+    Admin->>FS: Generate config/cam_id.env (with dynamically resolved IoT endpoint)
+    Admin->>FS: Generate config/cam_id_manifest.yaml (default rules/anchors)
+    Admin->>FS: Generate customized docker-compose.yml for this camera ID
+    Admin->>FS: Compress all files to onboard_bundles/deploy_cam_id.zip
+
+    Note over Admin, FS: Phase 4: Edge Delivery
+    Admin-->>Admin: Provide deploy_cam_id.zip to Client hardware
+```
+
+---
+
+## Open Questions
+
+> [!IMPORTANT]
+> Please review and provide feedback on the following design decisions:
+>
+> 1. **Default Manifest Rules**: When generating `config/<camera_id>_manifest.yaml` automatically, should we default to a standard `office_room` layout (with desks, distraction rules, mobile usage anomalies) or support pre-defined templates (e.g., `office`, `warehouse`, `retail`, `residential`) via a script parameter?
+> 2. **IoT Policy Wildcard vs Scoped**: Currently, our IoT policy allows publishing and subscribing to `*`. In production scaling, should we dynamically generate scoped policies restricting the certificate to only publish to `cctv/logs/<camera_id>`, `cctv/heartbeat/<camera_id>`, and subscribe to `cctv/commands/<camera_id>`? (Highly recommended for tenant security).
+> 3. **Output Bundle Delivery**: For edge deployment, do you prefer a simple ZIP bundle (unzip and run `docker compose up -d`), or a self-contained installation script (e.g., `install.sh` / `install.ps1`) that automatically checks for docker dependencies, downloads the images, installs the certificates, and registers the systemd daemon?
+
+---
+
+## Proposed Changes
+
+### TuringSight Cloud Registry
+
+We will introduce a new automated python script `onboard_camera.py` in the root of the `TuringSight/` repository.
+
+#### [NEW] [onboard_camera.py](file:///c:/Users/Shashanka/Desktop/TuringSight/onboard_camera.py)
+- **Role**: Command Line utility tool to automate the cloud registration, certificate creation, config generation, and zip packaging process.
+- **Workflow**:
+  1. Verify credentials and query IoT endpoint (`describe_endpoint(endpointType='iot:Data-ATS')`).
+  2. Create entry in `TuringSight-Camera-Registry` & `TuringSight-User-Cameras`.
+  3. Call `iot.create_keys_and_certificate` to retrieve mTLS PEM/private keys.
+  4. Attach the IoT Core policy (`TuringSightEdgePolicy` or a camera-scoped policy).
+  5. Generate:
+     - `deploy_<camera_id>/AmazonRootCA1.pem`
+     - `deploy_<camera_id>/certificate.pem.crt`
+     - `deploy_<camera_id>/private.pem.key`
+     - `deploy_<camera_id>/config/<camera_id>.env` (containing the certificate filenames, IoT endpoint, and camera parameters)
+     - `deploy_<camera_id>/config/<camera_id>_manifest.yaml` (default anchors, rules, motion configs)
+     - `deploy_<camera_id>/docker-compose.yml` (mapped to target the generated `.env` file)
+  6. Compress `deploy_<camera_id>/` to `onboard_bundles/deploy_<camera_id>.zip` and clean up the temporary directory.
+
+---
+
+## Verification Plan
+
+### Automated Verification
+- We will execute the `onboard_camera.py` utility with a test camera ID (`cam_test_provisioning_101`).
+- Verify that:
+  - The tables `TuringSight-Camera-Registry` and `TuringSight-User-Cameras` contain the new entries.
+  - AWS IoT Core registry lists the active certificate.
+  - The generated `onboard_bundles/deploy_cam_test_provisioning_101.zip` file exists and contains all required configurations.
+  - The generated `.env` files contain the correct endpoints.
+
+### Manual Verification
+- Unzip the generated deployment bundle on a test machine and verify that running `docker compose config` evaluates successfully and targets the correct environment variables.

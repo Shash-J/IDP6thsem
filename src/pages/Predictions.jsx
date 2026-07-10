@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useChambers } from '../hooks/useFirebase';
 import { predictBatteryMetrics } from '../utils/mlInference';
 import modelWeights from '../data/battery_ml_model.json';
+import { PredictionsSidebar } from '../components/PredictionsSidebar';
 import {
   ResponsiveContainer,
   LineChart,
@@ -118,8 +119,12 @@ const Predictions = () => {
         </p>
       </div>
 
-      {/* Chamber Selector */}
-      <div className="flex gap-2 bg-black/20 p-1 rounded-xl w-fit shrink-0">
+      {/* Main Split Grid Layout */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-4 gap-4 overflow-hidden">
+        {/* Left Section (ML Diagnostics & Graphs) */}
+        <div className="lg:col-span-3 flex flex-col gap-4 min-h-0 overflow-y-auto lg:overflow-hidden pr-0.5">
+          {/* Chamber Selector */}
+          <div className="flex gap-2 bg-black/20 p-1 rounded-xl w-fit shrink-0">
         {activeChambers.map((chamber) => (
           <button
             key={chamber.id}
@@ -443,7 +448,14 @@ const Predictions = () => {
         </div>
       </div>
     </div>
-  );
+
+    {/* Right Section (Co-Pilot Sidebar) */}
+    <div className="lg:col-span-1 min-h-0 h-full">
+      <PredictionsSidebar chamber={selectedChamber} predictions={livePredictions} />
+    </div>
+  </div>
+</div>
+);
 };
 
 export default Predictions;
