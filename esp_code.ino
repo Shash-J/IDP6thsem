@@ -39,11 +39,12 @@ bool battery2Low = false;
 
 String valve1 = "CLOSED";
 String valve2 = "CLOSED";
-String lastValve1 = "";
-String lastValve2 = "";
 
 String pumpStatus = "OFF";
 String systemMode = "AUTO"; // Dynamic system mode (AUTO / MANUAL)
+
+unsigned long lastLogTime = 0;
+const unsigned long logInterval = 1000; // Run sensor readings & log once per second
 
 // Adjust after testing
 const float THRESHOLD = 5.0;
@@ -219,16 +220,8 @@ void setup()
 
   pinMode(RELAY_PIN, OUTPUT);
 
-  // ESP32Servo PWM Timer Allocation to prevent jitter
-  ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  ESP32PWM::allocateTimer(2);
-  ESP32PWM::allocateTimer(3);
-  servo1.setPeriodHertz(50); // Standard 50Hz servo
-  servo2.setPeriodHertz(50); // Standard 50Hz servo
-
-  servo1.attach(SERVO1_PIN, 500, 2400);
-  servo2.attach(SERVO2_PIN, 500, 2400);
+  servo1.attach(SERVO1_PIN);
+  servo2.attach(SERVO2_PIN);
 
   servo1.write(0);
   servo2.write(0);
@@ -270,75 +263,102 @@ void loop()
 {
   server.handleClient();
 
-  distance1 = readDistance(TRIG1, ECHO1);
-  distance2 = readDistance(TRIG2, ECHO2);
-
-  // --- AUTOMATIC MODE ---
-  if (systemMode == "AUTO")
+  // Run sensor readings, mode controls, and logging once per second
+  if (millis() - lastLogTime >= logInterval)
   {
-    // Tank 1 Automatic Level Control
-    if(distance1 > THRESHOLD || distance1 == -1) // handle ultrasonic timeout
+    lastLogTime = millis();
+
+    distance1 = readDistance(TRIG1, ECHO1);
+    distance2 = readDistance(TRIG2, ECHO2);
+
+    // --- AUTOMATIC MODE ---
+    if (systemMode == "AUTO")
     {
-      battery1Low = true;
-      valve1 = "OPEN";
-    }
-    else
-    {
-      battery1Low = false;
-      valve1 = "CLOSED";
+      // Tank 1 Automatic Level Control
+      if(distance1 > THRESHOLD || distance1 == -1) // handle ultrasonic timeout
+      {
+        battery1Low = true;
+        valve1 = "OPEN";
+      }
+      else
+      {
+        battery1Low = false;
+        valve1 = "CLOSED";
+      }
+
+      // Tank 2 Automatic Level Control
+      if(distance2 > THRESHOLD || distance2 == -1) // handle ultrasonic timeout
+      {
+        battery2Low = true;
+        valve2 = "OPEN";
+      }
+      else
+      {
+        battery2Low = false;
+        valve2 = "CLOSED";
+      }
+
+      // Pump Automatic control based on low levels
+      if(battery1Low || battery2Low)
+      {
+        pumpStatus = "ON";
+      }
+      else
+      {
+        pumpStatus = "OFF";
+      }
     }
 
-    // Tank 2 Automatic Level Control
-    if(distance2 > THRESHOLD || distance2 == -1) // handle ultrasonic timeout
-    {
-      battery2Low = true;
-      valve2 = "OPEN";
-    }
-    else
-    {
-      battery2Low = false;
-      valve2 = "CLOSED";
-    }
+    // Log telemetry to Serial Monitor
+    Serial.println("============================");
 
-    // Pump Automatic control based on low levels
-    if(battery1Low || battery2Low)
-    {
-      pumpStatus = "ON";
-    }
-    else
-    {
-      pumpStatus = "OFF";
-    }
+    Serial.print("Battery 1 Distance : ");
+    Serial.print(distance1);
+    Serial.println(" cm");
+
+    Serial.print("Battery 1 Valve : ");
+    Serial.println(valve1);
+
+    Serial.println();
+
+    Serial.print("Battery 2 Distance : ");
+    Serial.print(distance2);
+    Serial.println(" cm");
+
+    Serial.print("Battery 2 Valve : ");
+    Serial.println(valve2);
+
+    Serial.println();
+
+    Serial.print("Pump Status : ");
+    Serial.println(pumpStatus);
+    
+    Serial.print("System Mode : ");
+    Serial.println(systemMode);
+
+    Serial.println("============================");
   }
 
-  // --- HARDWARE WRITES (Runs in both AUTO and MANUAL) ---
+  // --- HARDWARE WRITES (Runs in both AUTO and MANUAL, executing instantly on dashboard command) ---
   
   // Servo 1 write
-  if (valve1 != lastValve1)
+  if (valve1 == "OPEN")
   {
-    if (valve1 == "OPEN")
-    {
-      servo1.write(90);
-    }
-    else
-    {
-      servo1.write(0);
-    }
-    lastValve1 = valve1;
+    servo1.write(90);
+  }
+  else
+  {
+    servo1.write(0);
   }
 
   // Servo 2 write
-  if (valve2 != lastValve2)
+  if (valve2 == "OPEN")
   {
-    if (valve2 == "OPEN")
-    {
-      servo2.write(90);
-    }
-    else
-    {
-      servo2.write(0);
-    }
-    lastValve2 = valve2;
+    servo2.write(90);
+  }
+  else
+  {
+    servo2.write(0);
   }
 
   // Relay (Active LOW - Relay turns ON when write is LOW)
@@ -350,35 +370,4 @@ void loop()
   {
     digitalWrite(RELAY_PIN, HIGH);
   }
-
-  // Log telemetry to Serial Monitor
-  Serial.println("============================");
-
-  Serial.print("Battery 1 Distance : ");
-  Serial.print(distance1);
-  Serial.println(" cm");
-
-  Serial.print("Battery 1 Valve : ");
-  Serial.println(valve1);
-
-  Serial.println();
-
-  Serial.print("Battery 2 Distance : ");
-  Serial.print(distance2);
-  Serial.println(" cm");
-
-  Serial.print("Battery 2 Valve : ");
-  Serial.println(valve2);
-
-  Serial.println();
-
-  Serial.print("Pump Status : ");
-  Serial.println(pumpStatus);
-  
-  Serial.print("System Mode : ");
-  Serial.println(systemMode);
-
-  Serial.println("============================");
-
-  delay(1000);
 }
