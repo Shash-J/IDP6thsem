@@ -65,11 +65,11 @@ const subscribers = {
 
 const notify = (type) => {
   const dataMap = {
-    chambers: chamberData,
+    chambers: { ...chamberData },
     pump: pumpData,
     system: systemData,
     alerts: alertsData,
-    history: historyData
+    history: { ...historyData }
   };
   subscribers[type].forEach((cb) => cb(dataMap[type]));
 };
