@@ -40,14 +40,27 @@ export const predictBatteryMetrics = (voltage, current, temperature, internalRes
   const rawRul = predictSingle(modelWeights.rul);
   const rawSulfation = predictSingle(modelWeights.sulfation);
 
-  // Electrolyte degradation factor (0.4 at 0% electrolyte level up to 1.0 at 100% electrolyte level)
-  const electrolyteFactor = 0.4 + 0.6 * (el / 100);
+  // Electrolyte degradation curve:
+  // - Above 30%: battery operates near full capacity (factor 0.95–1.0)
+  // - Below 30%: plates begin to expose, steep performance cliff
+  // - At 0%: factor drops to 0.35 (severe degradation)
+  // Uses a smooth sigmoid-like ramp centered at 30% electrolyte level
+  let electrolyteFactor;
+  if (el >= 30) {
+    // Healthy range: very gentle linear slope (1.0 at 100%, 0.95 at 30%)
+    electrolyteFactor = 0.95 + 0.05 * ((el - 30) / 70);
+  } else {
+    // Critical range: steep exponential drop below 30%
+    // Maps 30% → 0.95 down to 0% → 0.35
+    electrolyteFactor = 0.35 + 0.60 * Math.pow(el / 30, 1.8);
+  }
 
   // Apply degradation modifier
   const soh = Math.max(20, Math.min(100, rawSoh * electrolyteFactor));
   const rul = Math.max(0, Math.min(365, rawRul * electrolyteFactor));
-  // Sulfation increases as electrolyte level drops (up to +50% sulfation at 0% level)
-  const sulfation = Math.max(0, Math.min(100, rawSulfation + (100 - el) * 0.5));
+  // Sulfation increases as electrolyte drops below 30% (plates exposed accelerates crystal buildup)
+  const sulfationPenalty = el < 30 ? (30 - el) * 1.5 : 0;
+  const sulfation = Math.max(0, Math.min(100, rawSulfation + sulfationPenalty));
 
   return {
     soh: Math.round(soh * 10) / 10,
