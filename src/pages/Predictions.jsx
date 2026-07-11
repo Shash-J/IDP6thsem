@@ -45,9 +45,10 @@ const Predictions = () => {
 
   // Real-time ML predictions for the active chamber (or fallback mock)
   const livePredictions = useMemo(() => {
+    const elLevel = selectedChamber?.waterPercent ?? 100;
     if (!selectedChamber || !selectedChamber.batteryParams) {
-      // Fallback standard prediction if telemetry loading
-      return predictBatteryMetrics(12.3, 4.0, 30.0, 5.2, 1.24, 100);
+      // Fallback standard prediction if telemetry loading — still uses actual electrolyte level
+      return predictBatteryMetrics(12.3, 4.0, 30.0, 5.2, 1.24, elLevel);
     }
     const bp = selectedChamber.batteryParams;
     return predictBatteryMetrics(
@@ -56,7 +57,7 @@ const Predictions = () => {
       bp.temperature,
       bp.internalResistance,
       bp.specificGravity,
-      selectedChamber.waterPercent ?? 100
+      elLevel
     );
   }, [selectedChamber]);
 
@@ -66,15 +67,18 @@ const Predictions = () => {
   }, [simVoltage, simCurrent, simTemp, simResistance, simGravity, simElectrolyte]);
 
   // Future Decay Curve Projection (180 Days)
-  // Calculates expected capacity fade under current operating temperatures
+  // Calculates expected capacity fade under current operating temperatures and electrolyte level
   const decayData = useMemo(() => {
     const data = [];
     const baseSoh = livePredictions.soh;
     const temp = selectedChamber?.batteryParams?.temperature || 28.0;
+    const elLevel = selectedChamber?.waterPercent ?? 100;
     
     // Physical degradation rate factor (degrades 2.5x faster for every 10C above 25C)
     const tempFactor = Math.exp(0.09 * Math.max(0, temp - 25));
-    const dailyDegradationRate = 0.04 * tempFactor; // base rate per day
+    // Electrolyte degradation: low electrolyte accelerates decay (up to 5x faster at 0%)
+    const elFactor = 1 + 4 * Math.pow((100 - elLevel) / 100, 1.5);
+    const dailyDegradationRate = 0.04 * tempFactor * elFactor; // combined rate per day
 
     for (let day = 0; day <= 180; day += 15) {
       const sohVal = Math.max(20, baseSoh - dailyDegradationRate * day);
