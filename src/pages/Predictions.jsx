@@ -155,7 +155,7 @@ const Predictions = () => {
       </div>
 
       {/* Grid 1: Live Predictions */}
-      <div className="grid grid-cols-3 gap-4 shrink-0">
+      <div className="grid grid-cols-4 gap-4 shrink-0">
         {/* State of Health Card */}
         <div className={`glass-card p-4 border ${getSoHColor(livePredictions.soh)}`}>
           <div className="flex justify-between items-start mb-2">
@@ -228,6 +228,41 @@ const Predictions = () => {
             Estimates lead sulfate crystal accumulation on lead plates. Severe sulfation blocks chemical energy conversion, spikes internal resistance, and leads to capacity loss.
           </p>
         </div>
+
+        {/* Electrolyte Level Card */}
+        {(() => {
+          const elPct = selectedChamber?.waterPercent ?? 0;
+          const elStatus = elPct <= 15 ? 'Critical' : elPct <= 30 ? 'Low' : 'Healthy';
+          const elColor = elPct <= 15
+            ? { text: 'text-red-400', border: 'border-red-500/20', bg: 'bg-red-500/5', bar: 'bg-red-500' }
+            : elPct <= 30
+            ? { text: 'text-amber-400', border: 'border-amber-500/20', bg: 'bg-amber-500/5', bar: 'bg-amber-500' }
+            : { text: 'text-cyan-400', border: 'border-cyan-500/20', bg: 'bg-cyan-500/5', bar: 'bg-cyan-500' };
+          return (
+            <div className={`glass-card p-4 border ${elColor.border} ${elColor.bg}`}>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">Electrolyte Level</p>
+                  <h3 className={`text-xl font-black mt-0.5 font-mono ${elColor.text}`}>{elPct.toFixed(1)}%</h3>
+                </div>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full border font-bold uppercase ${elColor.text} ${elColor.border} ${elColor.bg}`}>
+                  {elStatus}
+                </span>
+              </div>
+              
+              <div className="w-full bg-slate-800 rounded-full h-1.5 mb-2.5 overflow-hidden">
+                <div 
+                  className={`h-full rounded-full transition-all duration-1000 ${elColor.bar}`} 
+                  style={{ width: `${Math.min(elPct, 100)}%` }}
+                />
+              </div>
+              
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                Live electrolyte fill level from ultrasonic sensor. Low levels expose lead plates, accelerating sulfation and reducing capacity. Directly impacts SoH, RUL, and sulfation predictions.
+              </p>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Grid 2: What-If Simulator & Longevity Projection */}
